@@ -9,6 +9,10 @@
 
 void sha256();
 
+// See sections 4.1.2 + 4.2.2 for definitions
+uint32_t sig0(uint32_t x);
+uint32_t sig1(int32_t x);
+
 int main(int argc, char *argv[]){
 
 
@@ -19,7 +23,7 @@ int main(int argc, char *argv[]){
 void sha256(){
 
     // Message schedule (Section 6.2)
-    uint32_t w[64];
+    uint32_t W[64];
     // Working variables (Section 6.2)
     uint32_t a, b, c, d, e, f, g, h;
     // The Hash value.
@@ -41,5 +45,23 @@ void sha256(){
     };
 
     // The current message block.
-    uint32_t M[16] = 
+    uint32_t M[16];
+
+    // For looping...
+    int t;
+
+    // From page 22, W[t] = M[t] for 0 <= t <= 15.
+    for(t=0;t<16;t++)
+        W[t] = M[t];
+
+    for(t=16; t<64; t++)
+        sig_1(W[t-2]) + W[t-7] + sig_0(W[t-15]) + W[t-16];
+}
+
+uint32_t sig0(uint32_t x){
+
+}
+
+uint32_t sig1(int32_t x){
+    
 }
