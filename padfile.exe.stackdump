@@ -1,0 +1,9 @@
+Exception: STATUS_ACCESS_VIOLATION at eip=004011FC
+eax=00000000 ebx=0062CC5C ecx=80018020 edx=00000000 esi=0062CC70 edi=00000066
+ebp=0062CC38 esp=0062CBD0 program=C:\Users\dell\Documents\College Work\Year 4 semester 2\Theory Of Algorithems\SHA256ProjectTOA\padfile.exe, pid 655, thread main
+cs=0023 ds=002B es=002B fs=0053 gs=002B ss=002B
+Stack trace:
+Frame     Function  Args
+0062CC38  004011FC (00000002, 0062CC5C, 800280F0, 6100AA98)
+0062CD18  6100AAFA (00000000, 0062CD74, 61009A90, 00000000)
+End of stack trace
