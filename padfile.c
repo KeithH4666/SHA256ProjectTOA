@@ -7,6 +7,8 @@ union msgblock {
     uint64_t s[8];
 };
 
+enum status {READ, PADO, PAD1, FINISH};
+
 int main(int argc, char *argv[]){
 
     union msgblock M;
@@ -15,12 +17,13 @@ int main(int argc, char *argv[]){
 
     uint64_t nobytes;
 
+    enum status S = READ;
 
     FILE* f;
 
     f = fopen(argv[1], "r");
 
-    while(!feof(f)){
+    while(S == READ){
         nobytes = fread(M.e, 1, 64, f);
         printf("Read %2llu bytes\n", nobytes);
         nobits = nobits + (nobytes * 8);
