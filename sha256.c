@@ -22,8 +22,8 @@ uint32_t sig0(uint32_t x);
 uint32_t sig1(uint32_t x);
 
 //See Section 3.2 for definitions.
-uint32_t rotr(uint32_t n, uint32_t x);
-uint32_t shr(uint32_t n, uint32_t x);
+uint32_t rotr(uint32_t n, uint16_t x);
+uint32_t shr(uint32_t n, uint16_t x);
 
 //See Section 4.1.2 for definitions.
 uint32_t SIG0(uint32_t x);
@@ -181,7 +181,7 @@ int nextmessageblock(FILE *msgf, union msgblock *M, enum status *S, uint64_t *no
         *S = FINISH;
 
         if (*S == PAD1){
-          M->e[0] = 0x80;
+          M->e[0] = 0x01;
         }
         return 1;
     }
@@ -227,11 +227,11 @@ int nextmessageblock(FILE *msgf, union msgblock *M, enum status *S, uint64_t *no
 }
 
 //See Section 3.2 for definitions.
-uint32_t rotr(uint32_t n, uint32_t x){
+uint32_t rotr(uint32_t n, uint16_t x){
   return (x >> n) | (x << (32 - n));
 }
 
-uint32_t shr(uint32_t n, uint32_t x){
+uint32_t shr(uint32_t n, uint16_t x){
   return (x >> n);
 }
 
