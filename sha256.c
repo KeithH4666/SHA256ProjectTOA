@@ -14,6 +14,8 @@ union msgblock {
     uint64_t s[8];
 };
 
+uint64_t * sha256(FILE *f);
+
 // A flag for where we are in reading the file
 enum status {READ, PAD0, PAD1, FINISH};
 
@@ -33,8 +35,6 @@ uint32_t SIG1(uint32_t x);
 uint32_t Ch(uint32_t x, uint32_t y, uint32_t z);
 uint32_t Maj(uint32_t x, uint32_t y, uint32_t z);
 
-// Calculates the SHA256 hash of a file
-void sha256(FILE *f);
 
 // Retrieves the next message block.
 int nextmessageblock(FILE *f, union msgblock *M, enum status *S, uint64_t *nobits);
@@ -55,7 +55,7 @@ int main(int argc, char *argv[]){
   return 0;
 }
 
-void sha256(FILE *msgf){
+uint32_t * sha256(FILE *msgf){
 
   // The current message block
   union msgblock M;
