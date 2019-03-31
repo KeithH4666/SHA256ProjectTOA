@@ -12,7 +12,7 @@
 // Represents a message block
 union msgblock {
     uint8_t e[64];
-    uint32_t t[16];
+    uint32_t t[32];
     uint64_t s[8];
 };
 
@@ -35,11 +35,11 @@ enum status {READ, PAD0, PAD1, FINISH};
 #define ROTRIGHT(a,b) (((a) >> (b)) | ((a) << (32-(b))))
 #define Ch(x,y,z) (((x) & (y)) ^ (~(x) & (z)))
 #define Maj(x,y,z) (((x) & (y)) ^ ((x) & (z)) ^ ((y) & (z)))
-#define EP0(x) (ROTRIGHT(x,2) ^ ROTRIGHT(x,13) ^ ROTRIGHT(x,22))
-#define EP1(x) (ROTRIGHT(x,6) ^ ROTRIGHT(x,11) ^ ROTRIGHT(x,25))
+#define SIG0(x) (ROTRIGHT(x,2) ^ ROTRIGHT(x,13) ^ ROTRIGHT(x,22))
+#define SIG1(x) (ROTRIGHT(x,6) ^ ROTRIGHT(x,11) ^ ROTRIGHT(x,25))
 #define sig0(x) (ROTRIGHT(x,7) ^ ROTRIGHT(x,18) ^ ((x) >> 3))
 #define sig1(x) (ROTRIGHT(x,17) ^ ROTRIGHT(x,19) ^ ((x) >> 10))
-#define IS_BIG_ENDIAN (!*(unsigned char *)&(uint16_t){1})
+
 
 // Retrieves the next message block.
 int nextmessageblock(FILE *f, union msgblock *M, enum status *S, uint64_t *nobits);
@@ -124,18 +124,16 @@ uint64_t * sha256(FILE *msgf){
   while (nextmessageblock(msgf, &M, &S, &nobits)){
 
     //From page 22, W[t] = M[t] for 0 <= t <=15.
-    for (t = 0; t < 16; t++)
+    for (t = 0; t < 16; t++){
       //Convert to big endian (required for SHA)
-       if(IS_BIG_ENDIAN){
-          W[t] = M.t[t];
-        }
-        else{
-          W[t] = SWAP_UINT32(M.t[t]) ;
-        }
+      W[t] = SWAP_UINT32(M.t[t]) ;  
+    }
+  
     
     //From page 22, W[t] = ...
     for(t = 16; t < 64; t++)
-      W[t] = sig1(W[t-2]) + W[t-7] + sig0(W[t-15] + W[t-16]);
+       W[t] = sig1(W[t - 2]) + W[t - 7] + sig0(W[t - 15]) + W[t - 16];
+    }
 
     //Initialise a, b, c, .., h as per Step 2, Page 22.
     a = H[0]; b = H[1]; c = H[2]; d = H[3];
@@ -144,8 +142,8 @@ uint64_t * sha256(FILE *msgf){
     //Step 3.
     //Creating new values for working variables.
     for(t = 0; t < 64; t++) {
-      T1 = h + EP1(e) + Ch(e, f, g) + K[t] + W[t];
-      T2 = EP0(a) + Maj(a, b, c);
+      T1 = h + SIG1(e) + Ch(e, f, g) + K[t] + W[t];
+      T2 = SIG0(a) + Maj(a, b, c);
       h = g;
       g = f;
       f = e;
@@ -166,7 +164,7 @@ uint64_t * sha256(FILE *msgf){
     H[6] = g + H[6];
     H[7] = h + H[7];
 
-    }
+    
 
     // Loop through hash values and add to list variable
     for(t = 0; t < 8; t++){
