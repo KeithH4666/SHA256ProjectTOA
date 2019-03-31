@@ -6,6 +6,8 @@
 #include <stdio.h>
 //For using fixed-bit length integers.
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 // Represents a message block
 union msgblock {
@@ -48,9 +50,12 @@ int main(int argc, char *argv[]){
   // Open the file given as first command line argument
   FILE* msgf;
   msgf = fopen(argv[1], "r");
-  
+  uint64_t  *h;
   // Run the secure has algorithem on the file
-  sha256(msgf);
+  h = sha256(msgf);
+  for(int i =0; i < 8; i++){
+      printf("%08llx", *(h+i));
+  }
 
   // Close the file
   fclose(msgf);
@@ -58,7 +63,7 @@ int main(int argc, char *argv[]){
   return 0;
 }
 
-uint32_t * sha256(FILE *msgf){
+uint64_t * sha256(FILE *msgf){
 
   // The current message block
   union msgblock M;
@@ -120,7 +125,8 @@ uint32_t * sha256(FILE *msgf){
 
     //From page 22, W[t] = M[t] for 0 <= t <=15.
     for (t = 0; t < 16; t++)
-      W[t] = M.t[t];
+      //Convert to big endian (required for SHA)
+      W[t] = SWAP_UINT32(M.t[t]);
     
     //From page 22, W[t] = ...
     for(t = 16; t < 64; t++)
@@ -184,13 +190,13 @@ int nextmessageblock(FILE *msgf, union msgblock *M, enum status *S, uint64_t *no
         for (i = 0;i<56;i++){
             M->e[i] = 0x00;
         }
-        // Set the last 64 bits to the number of bits in the file (should be big endian)
-        M->s[7] = *nobits;
+        //flip the last 64 bits for big endian as this is what SHA uses.
+        M->s[7] = SWAP_UINT64(*nobits);
         // Tell S we are finished
         *S = FINISH;
 
         if (*S == PAD1){
-          M->e[0] = 0x01;
+          M->e[0] = 0x80;
         }
         return 1;
     }
@@ -211,7 +217,8 @@ int nextmessageblock(FILE *msgf, union msgblock *M, enum status *S, uint64_t *no
             M->e[nobytes] = 0x00;
         }
         // Append the file size in bits as a (should be big endian) unsigned 65 bit int.
-        M->s[7] = *nobits;
+        // Use the SWAP_UINT64 function to achieve this
+        M->s[7] = SWAP_UINT64(*nobits);;
         *S = FINISH;
     // Otherwise check if we can put some padding into this message block
     } else if (nobytes < 64){
