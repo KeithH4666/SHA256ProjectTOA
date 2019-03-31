@@ -35,11 +35,11 @@ enum status {READ, PAD0, PAD1, FINISH};
 #define ROTRIGHT(a,b) (((a) >> (b)) | ((a) << (32-(b))))
 #define Ch(x,y,z) (((x) & (y)) ^ (~(x) & (z)))
 #define Maj(x,y,z) (((x) & (y)) ^ ((x) & (z)) ^ ((y) & (z)))
-#define SIG0(x) (ROTRIGHT(x,2) ^ ROTRIGHT(x,13) ^ ROTRIGHT(x,22))
-#define SIG1(x) (ROTRIGHT(x,6) ^ ROTRIGHT(x,11) ^ ROTRIGHT(x,25))
+#define EP0(x) (ROTRIGHT(x,2) ^ ROTRIGHT(x,13) ^ ROTRIGHT(x,22))
+#define EP1(x) (ROTRIGHT(x,6) ^ ROTRIGHT(x,11) ^ ROTRIGHT(x,25))
 #define sig0(x) (ROTRIGHT(x,7) ^ ROTRIGHT(x,18) ^ ((x) >> 3))
 #define sig1(x) (ROTRIGHT(x,17) ^ ROTRIGHT(x,19) ^ ((x) >> 10))
-
+#define IS_BIG_ENDIAN (!*(unsigned char *)&(uint16_t){1})
 
 // Retrieves the next message block.
 int nextmessageblock(FILE *f, union msgblock *M, enum status *S, uint64_t *nobits);
@@ -105,13 +105,13 @@ uint64_t * sha256(FILE *msgf){
   //The values come from Section 5.3.3.
   uint32_t H[8] = {
     0x6a09e667,
-    0xbb67ae85,
-    0x3c6ef372,
-    0xa54ff53a,
-    0x510e527f,
-    0x9b05688c,
-    0x1f83d9ab,
-    0x5be0cd19
+		0xbb67ae85,
+		0x3c6ef372,
+		0xa54ff53a,
+		0x510e527f,
+		0x9b05688c,
+		0x1f83d9ab,
+		0x5be0cd19,
   };
 
 
@@ -126,7 +126,12 @@ uint64_t * sha256(FILE *msgf){
     //From page 22, W[t] = M[t] for 0 <= t <=15.
     for (t = 0; t < 16; t++)
       //Convert to big endian (required for SHA)
-      W[t] = SWAP_UINT32(M.t[t]);
+       if(IS_BIG_ENDIAN){
+          W[t] = M.t[t];
+        }
+        else{
+          W[t] = SWAP_UINT32(M.t[t]) ;
+        }
     
     //From page 22, W[t] = ...
     for(t = 16; t < 64; t++)
@@ -139,8 +144,8 @@ uint64_t * sha256(FILE *msgf){
     //Step 3.
     //Creating new values for working variables.
     for(t = 0; t < 64; t++) {
-      T1 = h + SIG1(e) + Ch(e, f, g) + K[t] + W[t];
-      T2 = SIG0(a) + Maj(a, b, c);
+      T1 = h + EP1(e) + Ch(e, f, g) + K[t] + W[t];
+      T2 = EP0(a) + Maj(a, b, c);
       h = g;
       g = f;
       f = e;
