@@ -53,7 +53,7 @@ int main(int argc, char *argv[]){
 
   // Open the file given as first command line argument
   FILE* msgf;
-  msgf = fopen(argv[1], "r");
+
   uint64_t  *h;
 
   // Simple Command Line Menu //
@@ -71,9 +71,13 @@ int main(int argc, char *argv[]){
   while((s=fgetc(msgf))!=EOF) {
       printf("%c",s);
   }
+
+  fclose(msgf);
+
   printf("\n--------------------------------------------");
   printf("\n\nHash:");
 
+  msgf=fopen(userInput,"r");
   // Run the secure has algorithem on the file
   h = sha256(msgf);
 
