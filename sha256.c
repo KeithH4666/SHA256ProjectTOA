@@ -49,6 +49,7 @@ int main(int argc, char *argv[]){
 
   // File path name
   char userInput[100]="";
+  char s;
 
   // Open the file given as first command line argument
   FILE* msgf;
@@ -57,10 +58,20 @@ int main(int argc, char *argv[]){
 
   // Simple Command Line Menu //
   printf("\n\nSHA-256 Cryptographic Hash Algorithm \n");
+  printf("--------------------------------------------");
   printf("\nPlease Enter Full Path of text file: \n");
   scanf("%s",&userInput);
   msgf=fopen(userInput,"r");
+  printf("--------------------------------------------");
   printf("\n\nVerify at https://www.movable-type.co.uk/scripts/sha256.html \n");
+  printf("--------------------------------------------");
+  printf("\nFile Contents:");
+
+  // https://www.tutorialspoint.com/print-contents-of-a-file-in-c
+  while((s=fgetc(msgf))!=EOF) {
+      printf("%c",s);
+  }
+  printf("\n--------------------------------------------");
   printf("\n\nHash:");
 
   // Run the secure has algorithem on the file
@@ -71,6 +82,7 @@ int main(int argc, char *argv[]){
   for(int i =0; i < 8; i++){
       printf("%08llx", *(h+i));
   }
+  printf("\n--------------------------------------------");
 
   // Close the file
   fclose(msgf);
