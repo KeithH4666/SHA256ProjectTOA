@@ -19,21 +19,15 @@ uint64_t * sha256(FILE *f);
 // A flag for where we are in reading the file
 enum status {READ, PAD0, PAD1, FINISH};
 
-//See Sections 4.1.2 for definitions.
-uint32_t sig0(uint32_t x);
-uint32_t sig1(uint32_t x);
-
 //See Section 3.2 for definitions.
-uint32_t rotr(uint32_t n, uint16_t x);
-uint32_t shr(uint32_t n, uint16_t x);
-
-//See Section 4.1.2 for definitions.
-uint32_t SIG0(uint32_t x);
-uint32_t SIG1(uint32_t x);
-
-//See Section 4.1.2 for definitions.
-uint32_t Ch(uint32_t x, uint32_t y, uint32_t z);
-uint32_t Maj(uint32_t x, uint32_t y, uint32_t z);
+// Also referenced this for information on Macros (https://github.com/B-Con/crypto-algorithms/blob/master/sha256.c)
+#define ROTRIGHT(a,b) (((a) >> (b)) | ((a) << (32-(b))))
+#define Ch(x,y,z) (((x) & (y)) ^ (~(x) & (z)))
+#define Maj(x,y,z) (((x) & (y)) ^ ((x) & (z)) ^ ((y) & (z)))
+#define SIG0(x) (ROTRIGHT(x,2) ^ ROTRIGHT(x,13) ^ ROTRIGHT(x,22))
+#define SIG1(x) (ROTRIGHT(x,6) ^ ROTRIGHT(x,11) ^ ROTRIGHT(x,25))
+#define sig0(x) (ROTRIGHT(x,7) ^ ROTRIGHT(x,18) ^ ((x) >> 3))
+#define sig1(x) (ROTRIGHT(x,17) ^ ROTRIGHT(x,19) ^ ((x) >> 10))
 
 
 // Retrieves the next message block.
@@ -226,38 +220,6 @@ int nextmessageblock(FILE *msgf, union msgblock *M, enum status *S, uint64_t *no
 
 }
 
-//See Section 3.2 for definitions.
-uint32_t rotr(uint32_t n, uint16_t x){
-  return (x >> n) | (x << (32 - n));
-}
 
-uint32_t shr(uint32_t n, uint16_t x){
-  return (x >> n);
-}
 
-uint32_t sig0(uint32_t x){
-  //See Sections 3.2 and 4.1.2 for definitions.
-  return (rotr(7, x) ^ rotr(18, x) ^ shr(3, x));
-} 
-  
-uint32_t sig1(uint32_t x){
-  //See Sections 3.2 and 4.1.2 for definitions.
-  return (rotr(17, x) ^ rotr(19, x) ^ shr(10, x));
-}
-
-uint32_t SIG0(uint32_t x){
-  return (rotr(2, x) ^ rotr(13, x) ^ rotr(22, x));
-}
-
-uint32_t SIG1(uint32_t x){
-  return (rotr(6, x) ^ rotr(11, x) ^ rotr(25, x));
-}
-
-uint32_t Ch(uint32_t x, uint32_t y, uint32_t z){
-  return ((x & y) ^ ((!x) & z));
-}
-
-uint32_t Maj(uint32_t x, uint32_t y, uint32_t z){
-  return ((x & y) ^ (x & z) ^ (y & z));
-}
 
