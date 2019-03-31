@@ -54,3 +54,10 @@ Here is a screenshot of my program running in the command prompt:
 Here is the same text file hashed using an online hashing script found [here](https://www.movable-type.co.uk/scripts/sha256.html)
 <img src="/OnlineHash.JPG" alt="Online"/>
 
+# Conclusion
+
+I would like to thanks our lecturer Dr Ian McLoughlin for his continued guidance throughout the project timeline.
+</br>
+Without his videos, it would have been far harder to get a basic understanding on how the algorithem works.
+
+
