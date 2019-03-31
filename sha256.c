@@ -47,12 +47,27 @@ int nextmessageblock(FILE *f, union msgblock *M, enum status *S, uint64_t *nobit
 // Start
 int main(int argc, char *argv[]){
 
+  // File path name
+  char userInput[100]="";
+
   // Open the file given as first command line argument
   FILE* msgf;
   msgf = fopen(argv[1], "r");
   uint64_t  *h;
+
+  // Simple Command Line Menu //
+  printf("\n\nSHA-256 Cryptographic Hash Algorithm \n");
+  printf("\nPlease Enter Full Path of text file: \n");
+  scanf("%s",&userInput);
+  msgf=fopen(userInput,"r");
+  printf("\n\nVerify at https://www.movable-type.co.uk/scripts/sha256.html \n");
+  printf("\n\nHash:");
+
   // Run the secure has algorithem on the file
   h = sha256(msgf);
+
+  // Output the hash
+  
   for(int i =0; i < 8; i++){
       printf("%08llx", *(h+i));
   }
