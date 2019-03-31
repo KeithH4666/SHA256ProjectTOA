@@ -20,6 +20,15 @@ uint64_t * sha256(FILE *f);
 enum status {READ, PAD0, PAD1, FINISH};
 
 //See Section 3.2 for definitions.
+// Swappng Macros
+#define SWAP_UINT32(x) (((x) >> 24) | (((x) & 0x00FF0000) >> 8) | (((x) & 0x0000FF00) << 8) | ((x) << 24))
+#define uchar unsigned char
+#define uint unsigned int
+#define SWAP_UINT64(x) \
+        ( (((x) >> 56) & 0x00000000000000FF) | (((x) >> 40) & 0x000000000000FF00) | \
+          (((x) >> 24) & 0x0000000000FF0000) | (((x) >>  8) & 0x00000000FF000000) | \
+          (((x) <<  8) & 0x000000FF00000000) | (((x) << 24) & 0x0000FF0000000000) | \
+          (((x) << 40) & 0x00FF000000000000) | (((x) << 56) & 0xFF00000000000000) )
 // Also referenced this for information on Macros (https://github.com/B-Con/crypto-algorithms/blob/master/sha256.c)
 #define ROTRIGHT(a,b) (((a) >> (b)) | ((a) << (32-(b))))
 #define Ch(x,y,z) (((x) & (y)) ^ (~(x) & (z)))
@@ -100,9 +109,11 @@ uint32_t * sha256(FILE *msgf){
     0x5be0cd19
   };
 
-  
+
   //For looping.
   int i, t;
+
+  uint64_t *list = malloc(sizeof(uint64_t[8]));
   
   //Loop through message blocks as per page 22. 
   while (nextmessageblock(msgf, &M, &S, &nobits)){
@@ -146,8 +157,12 @@ uint32_t * sha256(FILE *msgf){
 
     }
 
-    printf("%08x %08x %08x %08x %08x %08x %08x %08x\n", H[0], H[1], H[2], H[3], H[4], H[5], H[6], H[7]);
+    // Loop through hash values and add to list variable
+    for(t = 0; t < 8; t++){
+        list[t] = H[t];
+    }
 
+    return list;
 }
 
 int nextmessageblock(FILE *msgf, union msgblock *M, enum status *S, uint64_t *nobits){
