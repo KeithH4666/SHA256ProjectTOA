@@ -41,8 +41,7 @@ Here are the links to these videos:
 * [The Difference Between SHA-1,2 and 256](https://www.thesslstore.com/blog/difference-sha-1-sha-2-sha-256-hash-algorithms)
 * [SHA256 and Bitcoin](https://www.mycryptopedia.com/sha-256-related-bitcoin)
 </br>
-Another resource I used to find out about micro functions was [this](https://github.com/B-Con/crypto-algorithms/blob/master/sha256.c?fbclid=IwAR0s0i9xPPI5zhkQyfE4A8hjj0oTIDZBKGkyR7ruWGSM8IcKpvlyme2zHko
-) github repo.
+Another resource I used to find out about micro functions in regards to SHA256 was this github: https://github.com/B-Con/crypto-algorithms.git 
 </br>
 Individual research was also carried out mostly on youtube to understand how the process works.
 
